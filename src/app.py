@@ -38,6 +38,21 @@ def contact_route():
     return render_template("page.html", other_page="components/contact-us.html")
 
 
+@app.route("/user-profile")
+def user_profile_route():
+    return render_template("page.html", other_page="components/user/user-profile.html")
+
+
+@app.route("/user-payment")
+def user_payment_route():
+    return render_template("page.html", other_page="components/user/user-payment-html")
+
+
+@app.route("/user-parking-lot")
+def user_parking_route():
+    return render_template("page.html", other_page="components/user/user-parking-lot.html")
+
+
 @app.route("/car-reg")
 def car_route():
     return render_template("page.html", other_page="components/car-reg.html")
@@ -61,6 +76,7 @@ def add_user():
 @app.route("/admin/dashboard")
 def admin_dashboard():
     return render_template("admin.html", other_page="components/admin/dashboard.html")
+
 
 @app.route("/user")
 def get_all_users():
