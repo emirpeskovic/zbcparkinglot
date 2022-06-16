@@ -19,13 +19,13 @@ def index():
 
 
 @app.route("/register")
-def patter():
+def register_route():
     return render_template("page.html", other_page="components/register.html")
 
 
-@app.route("/test")
-def test():
-    return render_template("test.html", other_page="components/confirm.html")
+@app.route("/users")
+def users_route():
+    return render_template("page.html", other_page="components/users.html")
 
 
 @app.route("/users/add")
