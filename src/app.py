@@ -157,14 +157,20 @@ def parking_history_route():
     return render_template("page.html", other_page="components/user/parking-history.html")
 
 
-@app.route("/contact-us")
-def contact_route():
-    return render_template("page.html", other_page="components/contact-us.html")
-
-
-@app.route("/user-profile")
+@app.route("/user-profile", methods=["GET", "POST"])
 def user_profile_route():
-    return render_template('page.html', other_page="components/user/user-profile.html")
+    if "name" not in session:
+        return redirect("/")
+
+    if request.method == "GET":
+        return render_template('page.html', other_page="components/user/user-profile.html")
+    elif request.method == "POST":
+        user = database_manager.get(User, User.phone_number == session["phone"])
+        if user is not None:
+            session["name"] = user.name
+            session["address"] = user.address
+            session["email"] = user.email
+            return redirect("/")
 
 
 @app.route("/user-payment")
