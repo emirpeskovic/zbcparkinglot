@@ -24,7 +24,8 @@ class DatabaseManager:
         except PendingRollbackError:
             self.session.rollback()
             self.save(obj)
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
+            print(e)
             self.session.rollback()
             return False
         self.session.rollback()
