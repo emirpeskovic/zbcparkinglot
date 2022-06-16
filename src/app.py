@@ -38,6 +38,10 @@ def add_user():
         return "User not added"
 
 
+@app.route("/admin/dashboard")
+def admin_dashboard():
+    return render_template("admin.html", other_page="components/admin/dashboard.html")
+
 @app.route("/user")
 def get_all_users():
     users = database_manager.get_all(User)
