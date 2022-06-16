@@ -50,7 +50,7 @@ def user_profile_route():
 
 @app.route("/user-payment")
 def user_payment_route():
-    return render_template("page.html", other_page="components/user/user-payment-html")
+    return render_template("page.html", other_page="components/user/user-payment.html")
 
 
 @app.route("/user-parking-lot")
