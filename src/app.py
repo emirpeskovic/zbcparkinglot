@@ -23,6 +23,30 @@ def register():
     return render_template("page.html", other_page="components/register.html")
 
 
+@app.route("/users")
+def users_route():
+    return render_template("page.html", other_page="components/admin/users.html")
+
+
+@app.route("/parking-history")
+def parking_history_route():
+    return render_template("page.html", other_page="components/user/parking-history.html")
+
+
+@app.route("/contact-us")
+def contact_route():
+    return render_template("page.html", other_page="components/contact-us.html")
+
+
+@app.route("/car-reg")
+def car_route():
+    return render_template("page.html", other_page="components/car-reg.html")
+
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template("page.html", other_page="components/admin/dashboard.html")
+
 @app.route("/register/car")
 def register_car():
     return render_template("page.html", other_page="components/register-car.html")
