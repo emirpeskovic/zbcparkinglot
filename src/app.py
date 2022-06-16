@@ -63,11 +63,6 @@ def dashboard():
     return render_template("page.html", other_page="components/admin/dashboard.html")
 
 
-@app.route("/register/car")
-def register_car():
-    return render_template("page.html", other_page="components/register-car.html")
-
-
 @app.route("/admin")
 @app.route("/admin/dashboard")
 def admin_dashboard():
