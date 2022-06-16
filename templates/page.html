@@ -30,33 +30,5 @@
             });
         });
     });
-
-    var map = L.map('map').setView([55.42861, 11.78409], 20);
-
-	var tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxNativeZoom: 19, // OSM max available zoom is at 19.
-        maxZoom: 20, // Match the map maxZoom, or leave map.options.maxZoom undefined.
-		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-	}).addTo(map);
-
-    var markers = [
-        [55.42884, 11.78382],
-        [55.428832, 11.78387],
-        [55.428824, 11.78392],
-        [55.428816, 11.78397],
-        [55.428808, 11.78402],
-        [55.428800, 11.78407],
-        [55.428792, 11.78412],
-        [55.428784, 11.78417],
-        [55.428775, 11.78422],
-        [55.428767, 11.78427],
-        [55.428759, 11.78432],
-        [55.428751, 11.78437],
-    ]
-
-    for (var i = 0; i < markers.length; i++) {
-        L.marker(markers[i]).addTo(map);
-    }
-
 </script>
 </body>

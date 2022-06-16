@@ -1,14 +1,57 @@
+import re
+import threading
+from datetime import datetime
+from time import sleep
+
+import serial
 from flask import Flask, render_template, request, jsonify, session, redirect
-from car import Car
-from database_manager import DatabaseManager
-from manager import Manager
+
+from parking_status import ParkingStatus
 from user import User
+from car import Car
+from sensor import Sensor
+from card import Card
+from invoice import Invoice
+from database_manager import DatabaseManager
 import random
 
 app = Flask(__name__, template_folder="../templates", static_folder="../assets")
 app.secret_key = b'_5#y2L"FgTK9T30293124Q8z\n\126P5HL4YK7x\\ec]/'
 
 database_manager = DatabaseManager()
+
+
+def sensor_checker(database):
+    arduino = serial.Serial(port='COM6', baudrate=115200, timeout=.1)
+    while arduino.is_open:
+        while arduino.in_waiting:
+            data = int.from_bytes(arduino.readline())
+            if data & 0x100 or data & 0x200:
+                sensor_id = None
+                status = None
+
+                if data & 0x1:
+                    sensor_id = 1
+                elif data & 0x2:
+                    sensor_id = 2
+                elif data & 0x4:
+                    sensor_id = 3
+
+                if data & 0x100:
+                    status = ParkingStatus.Available
+                elif data & 0x200:
+                    status = ParkingStatus.Occupied
+
+                if sensor_id is not None:
+                    sensor = database.get(Sensor, Sensor.id == sensor_id)
+                    if sensor is not None:
+                        sensor.parking_status = status
+                        sensor.updated_at = datetime.now()
+                        database_manager.save(sensor)
+
+
+
+threading.Thread(target=lambda: sensor_checker(database_manager)).start()
 
 
 @app.route("/", methods=["GET"])
@@ -58,14 +101,22 @@ def register():
             email = request.form["email"]
             phone_number = request.form["phone"]
 
-            #if not name.isalpha():
-            #    return jsonify({"status": "error", "message": "Name must be alphabetic"}), 400
+            if not len(name) > 0:
+                return jsonify({"status": "error", "message": "Name cannot be empty"}), 400
 
-            #if not address.isalpha():
-            #    return jsonify({"status": "error", "message": "Address must be alphabetic"}), 400
+            for char in name:
+                if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ":
+                    return jsonify({"status": "error", "message": "Name can only use letters A to Z"}), 400
 
-            #if not email.isalpha():  # TODO: Check email better ('[a-z0-9]+@[a-z]+\.[a-z]{2,3}')
-            #    return jsonify({"status": "error", "message": "Email must be alphabetic"}), 400
+            if not len(address) > 0:
+                return jsonify({"status": "error", "message": "Address cannot be empty"}), 400
+
+            pattern = re.compile("^[A-Za-z\d._+%-]+@[A-Za-z\d.-]+[.][A-Za-z]+$")
+            if not pattern.match(email):
+                return jsonify({"status": "error", "message": "Email is not valid"}), 400
+
+            if not len(phone_number) > 0:
+                return jsonify({"status": "error", "message": "Phone number cannot be empty"}), 400
 
             if not phone_number.isdigit():
                 return jsonify({"status": "error", "message": "Phone number must be digits"}), 400
@@ -73,7 +124,7 @@ def register():
             if len(phone_number) != 8:
                 return jsonify({"status": "error", "message": "Phone number must be 8 digits"}), 400
 
-            user = User(phone_number=phone_number, name=name, address=address, email=email)
+            user = User(name=name, address=address, email=email, phone_number=phone_number)
 
             if database_manager.save(user):
                 session["name"] = name
@@ -147,6 +198,7 @@ def logout():
     session.clear()
     return redirect("/")
 
+
 @app.route("/users")
 def users_route():
     return render_template("page.html", other_page="components/admin/users.html")
@@ -196,14 +248,17 @@ def admin_dashboard():
 
 @app.route("/map")
 def parking_lot_map():
-    return render_template("page.html", other_page="components/map.html")
+    sensors = database_manager.get_all(Sensor)
+    json_sensors = []
+    for sensor in sensors:
+        json_sensors.append(sensor.serialize())
+    return render_template("map.html", sensors=json_sensors)
 
 
 @app.route("/test")
 def test():
-    user = User(name="Emir", address="Haraldsvej 12", email="me@emir.dk", phone_number="28116990")
-    database_manager.save(user)
-    return "YEEHAW"
+    users = database_manager.get_all(User)
+    return render_template("test.html", users=users)
 
 
-app.run(debug=True)
+#app.run(debug=True)

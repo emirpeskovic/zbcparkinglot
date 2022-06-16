@@ -10,3 +10,10 @@ class Sensor(Base):
     parking_status = Column(Enum(ParkingStatus))
     updated_at = Column(DateTime)
     user_id = Column(Integer, ForeignKey("users.id"))
+
+    def serialize(self):
+        return {
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "parking_status": self.parking_status.value,
+        }
