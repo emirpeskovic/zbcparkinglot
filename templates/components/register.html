@@ -7,7 +7,24 @@
         <form>
             <div class="mb-3">
                 <label class="form-label" for="phone">Phone number</label>
-                <input class="form-control item" type="tel" id="phone" required>
+                {% if session['phone'] %}
+                <input placeholder="12 34 56 78"
+                       class="form-control item"
+                       type="tel"
+                       id="phone"
+                       name="phone"
+                       pattern="[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}"
+                       value="{{ session['phone'] }}"
+                          required>
+                {% else %}
+                <input placeholder="12 34 56 78"
+                       class="form-control item"
+                       type="tel"
+                       id="phone"
+                       name="phone"
+                       pattern="[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}"
+                       required>
+                {% endif %}
             </div>
             <div class="mb-3">
                 <label class="form-label" for="name">Name</label>

@@ -9,4 +9,26 @@
      {% endif %}
 </section>
 {% include 'sections/footer.html' %}
+
+<script>
+    $(document).ready(function () {
+        $('#login').on('submit', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/login',
+                data: $(this).serialize(),
+                success: function (data) {
+                    if (data.status === 'success') {
+                        window.location.href = '/confirm';
+                    } else if (data.status === 'register') {
+                        window.location.href = '/register';
+                    } else {
+                        $('.alert').text(data.message).show();
+                    }
+                }
+            });
+        });
+    });
+</script>
 </body>

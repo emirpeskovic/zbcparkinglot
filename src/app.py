@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from database_manager import DatabaseManager
 from manager import Manager
+from user import User
 
 app = Flask(__name__, template_folder="../templates", static_folder="../assets")
+app.secret_key = b'_5#y2L"FgTK9T30293124Q8z\n\126P5HL4YK7x\\ec]/'
 
 database_manager = DatabaseManager()
 main_manager = Manager()
@@ -14,9 +16,24 @@ def index():
     if request.method == "GET":
         return render_template("page.html")
     elif request.method == "POST":
-        phone = request.form["phone"]
+        if "phone" in request.form:
+            phone = request.form["phone"]
 
-        return jsonify({"status": "success"}), 200
+            if not phone.isdigit():
+                return jsonify({"status": "error", "message": "Phone number must be digits"}), 400
+
+            if len(phone) != 8:
+                return jsonify({"status": "error", "message": "Phone number must be 8 digits"}), 400
+
+            session["phone"] = phone
+
+            user = database_manager.get(User, User.phone_number == phone)
+            if user is None:
+                return jsonify({"status": "register"}), 201
+            else:
+                return jsonify({"status": "success"}), 200
+        else:
+            return jsonify({"status": "error"}), 400
 
 
 @app.route("/login/confirm")
@@ -24,7 +41,7 @@ def confirm():
     return render_template("page.html", other_page="components/confirm.html")
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
     return render_template("page.html", other_page="components/register.html")
 

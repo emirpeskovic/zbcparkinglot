@@ -31,19 +31,3 @@
         </a>
     </form>
 </section>
-
-<script>
-    $(document).ready(function () {
-        $('#login').on('submit', function (e) {
-            e.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: '/login',
-                data: $(this).serialize(),
-                success: function (data) {
-
-                }
-            });
-        });
-    });
-</script>
