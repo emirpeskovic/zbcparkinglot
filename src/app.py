@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, jsonify, session, redirect
-
 from car import Car
 from database_manager import DatabaseManager
 from manager import Manager
 from user import User
+import random
 
 app = Flask(__name__, template_folder="../templates", static_folder="../assets")
 app.secret_key = b'_5#y2L"FgTK9T30293124Q8z\n\126P5HL4YK7x\\ec]/'
@@ -34,6 +34,14 @@ def index():
             if user is None:
                 return jsonify({"status": "register"}), 201
             else:
+                code_a = random.randint(0, 9)
+                code_b = random.randint(0, 9)
+                code_c = random.randint(0, 9)
+                code_d = random.randint(0, 9)
+
+                print(code_a, code_b, code_c, code_d)
+
+                session["code"] = str(code_a) + str(code_b) + str(code_c) + str(code_d)
                 return jsonify({"status": "success"}), 200
         else:
             return jsonify({"status": "error"}), 400  # 400 means a bad request
@@ -79,7 +87,36 @@ def register():
             return redirect("/register")
 
 
-@app.route("/register/car")
+@app.route("/login/confirm", methods=["GET", "POST"])
+def confirm():
+    if request.method == "GET":
+        return render_template("page.html", other_page="components/confirm.html")
+    elif request.method == "POST":
+        if "codeA" in request.form and "codeB" in request.form and "codeC" in request.form and "codeD" in request.form:
+            code_a = request.form["codeA"]
+            code_b = request.form["codeB"]
+            code_c = request.form["codeC"]
+            code_d = request.form["codeD"]
+
+            if code_a.isdigit() and code_b.isdigit() and code_c.isdigit() and code_d.isdigit():
+                if session["code"] == code_a + code_b + code_c + code_d:
+                    user = database_manager.get(User, User.phone_number == session["phone"])
+                    if user is not None:
+                        session["name"] = user.name
+                        session["address"] = user.address
+                        session["email"] = user.email
+                        return redirect("/")
+                    else:
+                        return redirect("/login")
+                else:
+                    return jsonify({"status": "error", "message": "Code is incorrect"}), 400
+            else:
+                return jsonify({"status": "error", "message": "Code must be digits"}), 400
+        else:
+            return jsonify({"status": "error", "message": "Code is incorrect"}), 400
+
+
+@app.route("/register/car", methods=["GET", "POST"])
 def register_car():
     if "name" not in session:
         return redirect("/")
@@ -101,12 +138,14 @@ def register_car():
                         return jsonify({"status": "error", "message": "Could not save car"}), 400
             else:
                 return jsonify({"status": "error"}), 400
+        else:
+            return jsonify({"status": "error"}), 400
 
 
-@app.route("/login/confirm")
-def confirm():
-    return render_template("page.html", other_page="components/confirm.html")
-
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
 
 @app.route("/users")
 def users_route():
@@ -147,6 +186,11 @@ def dashboard():
 @app.route("/admin/dashboard")
 def admin_dashboard():
     return render_template("admin.html", other_page="components/admin/dashboard.html")
+
+
+@app.route("/map")
+def parking_lot_map():
+    return render_template("page.html", other_page="components/map.html")
 
 
 @app.route("/test")

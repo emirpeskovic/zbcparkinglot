@@ -4,10 +4,10 @@
             <h2 class="text-info">Registration</h2>
             <p></p>
         </div>
-        <form id="register_car" action="/register/car">
+        <form method="post" action="/register/car">
             <div class="mb-3">
                 <label class="form-label" for="licence">License plate number</label>
-                <input id="licence" class="form-control item" type="text" required/>
+                <input id="licence" name="license" class="form-control item" type="text" required/>
             </div>
             <button class="btn btn-primary" type="submit">Add To Account</button>
         </form>
