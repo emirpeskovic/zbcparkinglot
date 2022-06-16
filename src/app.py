@@ -13,20 +13,19 @@ main_manager = Manager()
 @app.route("/login", methods=["POST"])
 def index():
     if request.method == "GET":
-        return render_template("index.html", test=True)
+        return render_template("page.html")
     elif request.method == "POST":
-        return render_template("components/confirm.html", test=False)
+        return render_template("page.html", other_page="components/confirm.html")
 
 
 @app.route("/register")
 def patter():
-    return render_template("etellerandet.html")
+    return render_template("page.html", other_page="components/register.html")
 
 
 @app.route("/test")
-@app.route("/test/<name>")
-def test(name=None):
-    return render_template("test.html", name=name)
+def test():
+    return render_template("test.html", other_page="components/confirm.html")
 
 
 @app.route("/users/add")
