@@ -9,19 +9,4 @@
      {% endif %}
 </section>
 {% include 'sections/footer.html' %}
-<script>
-    $(document).ready(function () {
-        $('#login').on('submit', function (e) {
-            e.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: '/login',
-                data: $(this).serialize(),
-                success: function (data) {
-                    $('#main').html(data);
-                }
-            });
-        });
-    });
-</script>
 </body>

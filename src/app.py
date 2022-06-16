@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from database_manager import DatabaseManager
 from manager import Manager
-from user import User
 
 app = Flask(__name__, template_folder="../templates", static_folder="../assets")
 
@@ -15,7 +14,14 @@ def index():
     if request.method == "GET":
         return render_template("page.html")
     elif request.method == "POST":
-        return render_template("page.html", other_page="components/confirm.html")
+        phone = request.form["phone"]
+
+        return jsonify({"status": "success"}), 200
+
+
+@app.route("/login/confirm")
+def confirm():
+    return render_template("page.html", other_page="components/confirm.html")
 
 
 @app.route("/register")

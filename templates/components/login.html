@@ -10,7 +10,8 @@
                 <label class="form-label" for="phone">Phone Number</label>
                 <input placeholder="12 34 56 78"
                        class="form-control item"
-                       type="tel" id="phone"
+                       type="tel"
+                       id="phone"
                        name="phone"
                        pattern="[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}"
                        required>
@@ -30,3 +31,19 @@
         </a>
     </form>
 </section>
+
+<script>
+    $(document).ready(function () {
+        $('#login').on('submit', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/login',
+                data: $(this).serialize(),
+                success: function (data) {
+
+                }
+            });
+        });
+    });
+</script>
