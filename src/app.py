@@ -19,7 +19,7 @@ def index():
 
 
 @app.route("/register")
-def register_route():
+def register():
     return render_template("page.html", other_page="components/register.html")
 
 
@@ -62,17 +62,12 @@ def car_route():
 def dashboard():
     return render_template("page.html", other_page="components/admin/dashboard.html")
 
-
-@app.route("/users/add")
-def add_user():
-    user = User(name="John", address="123 Main St.", email="john@4d2oe.com", phone_number="1233678")
-    res = database_manager.save(user)
-    if res is True:
-        return "User added successfully"
-    else:
-        return "User not added"
+@app.route("/register/car")
+def register_car():
+    return render_template("page.html", other_page="components/register-car.html")
 
 
+@app.route("/admin")
 @app.route("/admin/dashboard")
 def admin_dashboard():
     return render_template("admin.html", other_page="components/admin/dashboard.html")
