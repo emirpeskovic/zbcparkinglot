@@ -27,15 +27,11 @@ def sensor_checker(database):
             sensor_id = int.from_bytes(arduino.read(1), "big") + 1
             sensor_status = int.from_bytes(arduino.read(1), "big")
 
-            print(sensor_id, sensor_status)
-
             sensor = database.get(Sensor, Sensor.id == sensor_id)
             if sensor is not None:
                 sensor.parking_status = ParkingStatus(sensor_status)
                 sensor.updated_at = datetime.now()
                 database.save(sensor)
-
-    print("Thread died")
 
 
 threading.Thread(target=lambda: sensor_checker(database_manager)).start()
@@ -45,7 +41,8 @@ threading.Thread(target=lambda: sensor_checker(database_manager)).start()
 @app.route("/login", methods=["POST"])
 def index():
     if "name" in session:
-        return redirect("/dashboard")
+        return redirect("/user-profile")
+
     if request.method == "GET":
         return render_template("page.html")
     elif request.method == "POST":
@@ -118,7 +115,7 @@ def register():
                 session["address"] = address
                 session["email"] = email
                 session["phone"] = phone_number
-                return redirect("/")
+                return redirect("/map")
             else:
                 return redirect("/register")
         else:
@@ -143,7 +140,7 @@ def confirm():
                         session["name"] = user.name
                         session["address"] = user.address
                         session["email"] = user.email
-                        return redirect("/")
+                        return redirect("/map")
                     else:
                         return redirect("/login")
                 else:
