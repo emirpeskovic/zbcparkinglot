@@ -1,7 +1,6 @@
 import re
 import threading
 from datetime import datetime
-from time import sleep
 
 import serial
 from flask import Flask, render_template, request, jsonify, session, redirect
@@ -22,33 +21,21 @@ database_manager = DatabaseManager()
 
 
 def sensor_checker(database):
-    arduino = serial.Serial(port='COM6', baudrate=115200, timeout=.1)
+    arduino = serial.Serial(port='COM7', baudrate=115200, timeout=.1)
     while arduino.is_open:
         while arduino.in_waiting:
-            data = int.from_bytes(arduino.readline())
-            if data & 0x100 or data & 0x200:
-                sensor_id = None
-                status = None
+            sensor_id = int.from_bytes(arduino.read(1), "big") + 1
+            sensor_status = int.from_bytes(arduino.read(1), "big")
 
-                if data & 0x1:
-                    sensor_id = 1
-                elif data & 0x2:
-                    sensor_id = 2
-                elif data & 0x4:
-                    sensor_id = 3
+            print(sensor_id, sensor_status)
 
-                if data & 0x100:
-                    status = ParkingStatus.Available
-                elif data & 0x200:
-                    status = ParkingStatus.Occupied
+            sensor = database.get(Sensor, Sensor.id == sensor_id)
+            if sensor is not None:
+                sensor.parking_status = ParkingStatus(sensor_status)
+                sensor.updated_at = datetime.now()
+                database.save(sensor)
 
-                if sensor_id is not None:
-                    sensor = database.get(Sensor, Sensor.id == sensor_id)
-                    if sensor is not None:
-                        sensor.parking_status = status
-                        sensor.updated_at = datetime.now()
-                        database_manager.save(sensor)
-
+    print("Thread died")
 
 
 threading.Thread(target=lambda: sensor_checker(database_manager)).start()
@@ -261,4 +248,4 @@ def test():
     return render_template("test.html", users=users)
 
 
-#app.run(debug=True)
+app.run(use_reloader=False)
